@@ -41,9 +41,28 @@ app.get('/products/list', function(req, res) {
 //GET /products/:product_id
 //parameters: product_id
 app.get('/products/:product_id', function(req, res) {
-  //now query the database for this info
-  models.productInformationQuery(req.params.product_id).then((data) => {
-    res.status(200).send(data);
+  models.prodInfo(req.params.product_id).then((data) => {
+    //tranform features data
+    const featuresArray = [];
+    for (let i = 0; i < data[1].length; i++) {
+      featuresArray.push({
+        feature: data[1][i].feature,
+        value: data[1][i].feature_value
+      });
+    }
+
+    //transform products data
+    data = data[0][0];
+    const payload = {
+      id: data.product_id,
+      name: data.name,
+      slogan: data.slogan,
+      description: data.description,
+      category: data.catagory,
+      default_price: data.default_price,
+      features: featuresArray
+    };
+    res.status(200).send(payload);
   });
 });
 

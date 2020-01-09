@@ -19,6 +19,7 @@
   "dependencies": {
     "express": "^4.17.1",
     "node": "^13.5.0",
+    "nodemon": "^2.0.2",
     "pg-promise": "^10.3.2"
   }
 }

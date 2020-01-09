@@ -16,8 +16,6 @@ const relatedQuery = function(item) {
   return db.any('SELECT * FROM products WHERE product_id = $1;', [item]);
 };
 
-module.exports = { productInformationQuery, listProductsQuery };
-
 //Related Products
 //GET /products/:product_id/related
 //parameters: product_id
@@ -55,3 +53,17 @@ module.exports = { productInformationQuery, listProductsQuery };
 //   	// ...
 // 	],
 // }
+
+const prodInfo = function(item) {
+  const product = db.any('SELECT * FROM products WHERE product_id = $1;', [
+    item
+  ]);
+  const features = db.any('SELECT * FROM features WHERE product_id = $1;', [
+    item
+  ]);
+
+  return Promise.all([product, features]);
+  //return { product: product, features: features };
+};
+
+module.exports = { productInformationQuery, listProductsQuery, prodInfo };
