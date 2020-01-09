@@ -69,3 +69,19 @@ app.get('/products/:product_id', function(req, res) {
 //product styles
 //GET /products/:product_id/styles
 //parameters: product_id
+
+//related products
+//GET /products/:product_id/related
+app.get('/products/:product_id/related', function(req, res) {
+  models.related(req.params.product_id).then((data) => {
+    console.log(data);
+
+    const relatedArray = [];
+
+    for (let i = 0; i < data.length; i++) {
+      relatedArray.push(Number(data[i].related_id));
+    }
+
+    res.status(200).send(relatedArray);
+  });
+});

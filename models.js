@@ -12,8 +12,8 @@ const listProductsQuery = function(item) {
   );
 };
 
-const relatedQuery = function(item) {
-  return db.any('SELECT * FROM products WHERE product_id = $1;', [item]);
+const related = function(item) {
+  return db.any('SELECT * FROM related WHERE product_id = $1;', [item]);
 };
 
 //Related Products
@@ -33,27 +33,6 @@ const relatedQuery = function(item) {
 // };
 
 //product information
-
-// {
-// 	"id": 11,
-// 	"name": "Air Minis 250",
-// 	"slogan": "Full court support",
-// 	"description": "This optimized air cushion pocket reduces impact but keeps a perfect balance underfoot.",
-// 	"category": "Basketball Shoes",
-// 	"default_price": "0",
-// 	"features": [
-//   	{
-// 			"feature": "Sole",
-// 			"value": "Rubber"
-// 		},
-//   	{
-// 			"feature": "Material",
-// 			"value": "FullControlSkin"
-// 		},
-//   	// ...
-// 	],
-// }
-
 const prodInfo = function(item) {
   const product = db.any('SELECT * FROM products WHERE product_id = $1;', [
     item
@@ -66,4 +45,9 @@ const prodInfo = function(item) {
   //return { product: product, features: features };
 };
 
-module.exports = { productInformationQuery, listProductsQuery, prodInfo };
+module.exports = {
+  productInformationQuery,
+  listProductsQuery,
+  prodInfo,
+  related
+};
