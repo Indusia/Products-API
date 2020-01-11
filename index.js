@@ -1,7 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-
 const models = require('./models');
 
 const app = express();
@@ -32,7 +31,10 @@ app.get('/', function(req, res) {
 //GET /products/list  Retrieves the list of products
 //parameters: page, count
 app.get('/products/list', function(req, res) {
-  models.listProductsQuery().then((data) => {
+  let options = req.query;
+  console.log('options:');
+  console.log(options);
+  models.productsList(options).then((data) => {
     res.status(200).send(data);
   });
 });
@@ -40,48 +42,107 @@ app.get('/products/list', function(req, res) {
 //Products Information
 //GET /products/:product_id
 //parameters: product_id
-app.get('/products/:product_id', function(req, res) {
-  models.prodInfo(req.params.product_id).then((data) => {
-    //tranform features data
-    const featuresArray = [];
-    for (let i = 0; i < data[1].length; i++) {
-      featuresArray.push({
-        feature: data[1][i].feature,
-        value: data[1][i].feature_value
-      });
-    }
 
-    //transform products data
-    data = data[0][0];
-    const payload = {
-      id: data.product_id,
-      name: data.name,
-      slogan: data.slogan,
-      description: data.description,
-      category: data.catagory,
-      default_price: data.default_price,
-      features: featuresArray
-    };
-    res.status(200).send(payload);
+app.get('/products/:product_id', function(req, res) {
+  models
+    .prodInfo(req.params.product_id)
+    .then((data) => {
+      const featuresArray = [];
+      for (let i = 0; i < data.length; i++) {
+        let temp = {
+          feature: data[i].feature,
+          value: data[i].feature_value
+        };
+        featuresArray.push(temp);
+      }
+
+      data = data[0];
+
+      const payload = {
+        id: data.product_id,
+        name: data.name,
+        slogan: data.slogan,
+        description: data.description,
+        category: data.catagory,
+        default_price: data.default_price,
+        features: featuresArray
+      };
+
+      res.status(200).send(payload);
+    })
+    .catch((err) => {
+      console.log('prod info error');
+      console.log(error);
+    });
+});
+
+//related products
+//GET /products/:product_id/related
+app.get('/products/:product_id/related', function(req, res) {
+  models.related(req.params.product_id).then((data) => {
+    const relatedArray = [];
+    for (let i = 0; i < data.length; i++) {
+      relatedArray.push(Number(data[i].related_id));
+    }
+    res.status(200).send(relatedArray);
   });
 });
 
 //product styles
 //GET /products/:product_id/styles
 //parameters: product_id
+app.get('/products/:product_id/styles', function(req, res) {
+  models
+    .productStyles(req.params.product_id)
+    .then((data) => {
+      let skus = data[0];
+      let images = data[1];
+      let styles = {};
 
-//related products
-//GET /products/:product_id/related
-app.get('/products/:product_id/related', function(req, res) {
-  models.related(req.params.product_id).then((data) => {
-    console.log(data);
+      // create style objects to send back
+      let skuObj = {};
+      let photoArray = [];
 
-    const relatedArray = [];
+      for (let i = 0; i < skus.length; i++) {
+        let temp = skus[i].style_id;
 
-    for (let i = 0; i < data.length; i++) {
-      relatedArray.push(Number(data[i].related_id));
-    }
+        if (styles[temp] !== undefined) {
+          skuObj = styles[temp]['skus'];
+          skuObj[skus[i].size] = skus[i].quantity;
+        } else {
+          skuObj[skus[i].size] = skus[i].quantity;
+        }
 
-    res.status(200).send(relatedArray);
-  });
+        styles[temp] = {
+          style_id: skus[i].style_id,
+          name: skus[i].name,
+          original_price: skus[i].original_price,
+          sale_price: skus[i].sale_price,
+          'default?': skus[i].default_style,
+          photos: photoArray,
+          skus: skuObj
+        };
+      }
+
+      for (let i = 0; i < images.length; i++) {
+        styles[images[i].style_id].photos.push({
+          url: images[i].main_url,
+          thumbnail_url: images[i].thumbnail_url
+        });
+      }
+
+      let payload = {
+        product_id: req.params.product_id,
+        results: []
+      };
+
+      for (let key in styles) {
+        payload.results.push(styles[key]);
+      }
+
+      res.status(200).send(payload);
+    })
+    .catch((err) => {
+      console.log(err);
+    });
 });
