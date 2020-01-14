@@ -1,5 +1,8 @@
 var pgp = require('pg-promise')(/* options */);
-var db = pgp('postgres://postgres:docker@localhost:5432/sdc1');
+
+
+let dbHost = '18.191.199.22'
+var db = pgp(`postgres://postgres:docker@${dbHost}:5432/sdc1`);
 
 const related = function(item) {
   return db.any('SELECT * FROM related WHERE product_id = $1;', [item]);
