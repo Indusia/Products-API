@@ -4,7 +4,9 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "jest",
+    "server-dev": "nodemon index.js",
+    "start": "node index.js"
   },
   "repository": {
     "type": "git",
@@ -17,8 +19,12 @@
   },
   "homepage": "https://github.com/Indusia/sdc-products-server#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "jest": "^24.9.0",
     "node": "^13.5.0",
-    "pg-promise": "^10.3.2"
+    "nodemon": "^2.0.2",
+    "pg-promise": "^10.3.2",
+    "redis": "^2.8.0"
   }
 }
