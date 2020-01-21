@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/Indusia/sdc-products-server#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^4.17.1",
     "jest": "^24.9.0",
     "node": "^13.5.0",

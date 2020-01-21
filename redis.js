@@ -1,8 +1,8 @@
-//let util = require('util');
+let util = require('util');
 const { promisify } = require('util');
 
 var redis = require('redis'),
-  client = redis.createClient();
+  client = redis.createClient({ host: 'redis' });
 //host: 'redis'
 client.on('error', function(err) {
   console.log('error with redis connection: ' + err);

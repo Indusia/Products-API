@@ -3,9 +3,12 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const models = require('./models');
 const client = require('./redis.js');
+const cors = require('cors');
 
 const app = express();
 const PORT = 17777;
+
+app.use(cors());
 
 app.use(bodyParser.json());
 app.use(express.static(path.join(__dirname, './dist')));
@@ -132,9 +135,11 @@ app.get('/products/:product_id/styles', function(req, res) {
     .then((data) => {
       if (data) {
         //if present in query, send it from there
-        console.log('cached response:');
-        console.log(data);
-        res.status(200).send(data);
+        // console.log('cached response:');
+        // console.log(data);
+
+        //added JSON.parse here. Needs a little testing
+        res.status(200).send(JSON.parse(data));
       } else {
         //otherwise query postgres
         models
@@ -169,7 +174,14 @@ app.get('/products/:product_id/styles', function(req, res) {
               };
             }
 
+            console.log('images');
+            console.log(images);
+            console.log('styles');
+            console.log(styles);
+            //let counter = 0
             for (let i = 0; i < images.length; i++) {
+              console.log(i);
+
               styles[images[i].style_id].photos.push({
                 url: images[i].main_url,
                 thumbnail_url: images[i].thumbnail_url
